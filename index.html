@@ -1,0 +1,107 @@
+<html>
+
+<head>
+  <title>The Truth About Alt</title>
+  <link rel="stylesheet" href="index.css">
+  <link rel="icon" href="alt.ico" />
+  <script src="cctv.js"></script>
+  <script src="utils.js"></script>
+
+  <script>
+    //https://dev.to/ekeijl/retro-crt-terminal-screen-in-css-js-4afh
+    const clickAudio = new Audio("audio/web_SoundFX_254286__jagadamba__mechanical-switch.mp3");
+    let speed = 50;
+
+  
+    const transcript = async () => {
+      const lines = [
+        "[BEGIN LOG: December 14th, 2008]",
+         "18:00: DAY SHIFT HERE. BEEN TOLD MOST OF THE PREVIOUS SEC TEAM GOT LET GO. NOT SURE WHY. THEY ONLY JUST GOT THE LOGS UP AND RUNNING A FEW MINUTES AGO. I WON'T HAVE TIME TO REVIEW THEM BEFORE THE SHIFT CHANGE. GOOD LUCK. OVER.",
+         "P.S. DON'T FORGET TO CHECK ALL CAMERA FEEDS. DON'T SCREW THIS UP."
+        ];
+      const terminal = document.querySelector("#log-terminal");
+      terminal.innerHTML = "";
+      for(let line of lines){
+        const element = document.createElement("p");
+        terminal.append(element);
+        await typeWrite(terminal,element, line)
+        await sleep(speed*10);
+
+      }
+    }
+
+    const setupCanvas = ()=>{
+      const canvas = document.querySelector("#canvas");
+      const image = document.createElement("img");
+      const frames = [];
+      image.crossOrigin = "Anonymous";
+      image.onload = ()=>{
+        console.log("JR NOTE: image loaded")
+        frames.push(new AnimationFrame(image, 1));
+        const feed = new CameraFeed(0,frames);
+        const cctv = new CCTV(feed, canvas);
+        cctv.play();
+      }
+      image.src = "sample.jpg";
+    }
+
+    const typeWrite = async(scroll_element, element,text) => {
+      if(text.charAt(0)=="["){
+        element.innerHTML=text;
+        scroll_element.scrollTop = scroll_element.scrollHeight;
+        await sleep(speed* 10);
+        return;
+      }
+      console.log("JR NOTE: first char is", text.charAt[0], "speed is", speed);
+      for(let i = 0; i< text.length; i++){
+        await sleep(speed);
+        clickAudio.play();
+        element.innerHTML += text.charAt(i);
+        scroll_element.scrollTop = scroll_element.scrollHeight;
+      }
+    }
+
+    const play = () => {
+      transcript();
+    }
+
+
+    window.onload = () => {
+      setupCanvas();
+      window.onclick = () => {
+        clickAudio.play();
+      }
+
+      window.onmousedown = ()=>{
+          speed = 0;
+      }
+      window.onmouseup = ()=>{
+        speed = 50;
+      }
+    }
+  </script>
+
+
+</head>
+
+<body>
+  <div id ="dock">
+  <div id="tv">
+    <div class="terminal" id="tv-terminal">
+      <canvas id="canvas" width="500" height="500"/>
+    </div>
+  </div>
+
+  <div id="crt">
+    <div class="scanline"></div>
+    <div class="lines"></div>
+
+    <div class="terminal" id="log-terminal">
+      <button id="log-button" onClick="play()">Click To View Associated Log</button>
+    </div>
+  </div>
+</div>
+
+</body>
+
+</html>
