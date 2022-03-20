@@ -15,14 +15,15 @@
     //consists of a set of terminal log lines, and a cctv feed.
     const cameras = [];
 
-    let current_cctv;
+    let display_screen;
     let typing = false;
 
-    const setupScreens = async() => {
+    const setupScreens = async () => {
       const button = document.querySelector("#log-button");
       const buttonBar = document.querySelector("#button-bar");
 
       const canvas = document.querySelector("#canvas");
+      display_screen = new CCTV(null, canvas);
       const one = await screen1(canvas, buttonBar);
       button.innerHTML = "Click To Log In";
 
@@ -31,10 +32,10 @@
       cameras.push(two);
     }
 
-    const screen1 = async(canvas,buttonBar) => {
+    const screen1 = async (canvas, buttonBar) => {
       const lines = [
         "[BEGIN LOG: December 14th, 2008]",
-        "18:00: DAY SHIFT HERE. BEEN TOLD MOST OF THE PREVIOUS SEC TEAM GOT LET GO. NOT SURE WHY. THEY ONLY JUST GOT THE LOGS AND FEEDS UP AND RUNNING A FEW MINUTES AGO. I WON'T HAVE TIME TO REVIEW THEM BEFORE THE SHIFT CHANGE. GOOD LUCK. OVER.",
+        "21:55: DAY SHIFT HERE. BEEN TOLD MOST OF THE PREVIOUS SEC TEAM GOT LET GO. NOT SURE WHY. THEY ONLY JUST GOT THE LOGS AND FEEDS UP AND RUNNING A FEW MINUTES AGO. I WON'T HAVE TIME TO REVIEW THEM BEFORE THE SHIFT CHANGE. GOOD LUCK. OVER.",
         "P.S. DON'T FORGET TO CHECK ALL CAMERA FEEDS. DON'T SCREW THIS UP.  GUESTS OR NOT WE HAVE A JOB TO DO.",
         "[BEGIN LOG: December 8th, 2008]",
         "[TIMECODE: 08:03.] DISTURBANCE. MINOR SCUFFLING BETWEEN GUESTS CHECKING OUT. STAFF DISPATCHED.",
@@ -48,15 +49,15 @@
         "[TIMECODE: 19:23] LAST SCHEDULED GUEST CHECKED IN. LOCKDOWN PROCEDURES INITIATED.",
         "[TIMECODE: 22:15.] DISTURBANCE. MASS POWER OUTAGE. STAFF DISPATCHED.",
       ];
-      const cctv = await setUpCCTV(canvas,"images/lobby.PNG")
+      const cctv = await setUpCCTV(canvas, "images/lobby.PNG")
       const button = document.createElement("button");
       button.innerHTML = "LOBBY";
-      button.onclick= ()=>{play(0)};
+      button.onclick = () => { play(0) };
       buttonBar.append(button);
       return { lines, cctv }
     }
 
-    const screen2 = async(canvas,buttonBar) => {
+    const screen2 = async (canvas, buttonBar) => {
       const lines = [
         "[TIMECODE: 07:00.][AUTOMATED GUEST HOURLY COUNT]: 1 ",
         "[TIMECODE: 08:00.][AUTOMATED GUEST HOURLY COUNT]: 2 ",
@@ -78,10 +79,10 @@
         "[TIMECODE: 23:00.][AUTOMATED GUEST HOURLY COUNT]: 0",
         "[SYSTEM SHUTOFF]",
       ];
-      const cctv = await setUpCCTV(canvas,"images/entrance.jpg")
+      const cctv = await setUpCCTV(canvas, "images/entrance.jpg")
       const button = document.createElement("button");
       button.innerHTML = "ENTRANCE";
-      button.onclick= ()=>{play(1)};
+      button.onclick = () => { play(1) };
       buttonBar.append(button);
       return { lines, cctv }
     }
@@ -92,7 +93,7 @@
       const terminal = document.querySelector("#log-terminal");
       terminal.innerHTML = "";
       for (let line of lines) {
-        if(!typing){
+        if (!typing) {
           break;
         }
         const element = document.createElement("p");
@@ -104,17 +105,17 @@
     }
 
     const setUpCCTV = async (canvas, src) => {
-      try{
-      console.log("JR NOTE: trying to set up cctv", canvas, src)
-      const frames = [];
-      const image = await addImageProcess(src);
-      console.log("JR NOTE: image is", image)
-      frames.push(new AnimationFrame(image, 1));
-      const feed = new CameraFeed(0, frames);
-      const cctv = new CCTV(feed, canvas);
-      cctv.setReadyToPlay(true);
-      return cctv;
-      }catch(e){
+      try {
+        console.log("JR NOTE: trying to set up cctv", canvas, src)
+        const frames = [];
+        const image = await addImageProcess(src);
+        console.log("JR NOTE: image is", image)
+        frames.push(new AnimationFrame(image, 1));
+        const feed = new CameraFeed(0, frames);
+        const cctv = new CCTV(feed, canvas);
+        cctv.setReadyToPlay(true);
+        return cctv;
+      } catch (e) {
         console.error("ERROR SETTING UP CCTV FEED!")
         return null;
       }
@@ -124,18 +125,18 @@
       typing = true;
       let skipping = false;
       for (let i = 0; i < text.length; i++) {
-        if(text.charAt(i) === "["){
+        if (text.charAt(i) === "[") {
           skipping = true;
-        }else if(text.charAt(i)==="]"){
+        } else if (text.charAt(i) === "]") {
           skipping = false;
         }
-        if(!skipping){
+        if (!skipping) {
           await sleep(speed);
           clickAudio.play();
         }
         element.innerHTML += text.charAt(i);
         scroll_element.scrollTop = scroll_element.scrollHeight;
-        if(!typing){
+        if (!typing) {
           break;
         }
       }
@@ -144,12 +145,13 @@
     const play = (camera_index) => {
       console.log("JR NOTE: attempting to play", camera_index);
       typing = false;
+      display_screen.stop();
+      let timecode = display_screen?.cameraFeed?.timecode ?? 108500; //22:00
+      console.log("JR NOTE: attempting to play at", timecode);
+
       transcript(cameras[camera_index].lines);
-      if(current_cctv){
-        current_cctv.stop();
-      }
-      current_cctv = cameras[camera_index].cctv;
-      current_cctv.play();
+      display_screen.cameraFeed = cameras[camera_index].cctv.cameraFeed;
+      display_screen.play(timecode);
     }
 
 
@@ -188,7 +190,7 @@
         (CLICK AND HOLD TO SPEED UP)
       </div>
     </div>
-    <div id = "button-bar"></div>
+    <div id="button-bar"></div>
   </div>
 
 </body>

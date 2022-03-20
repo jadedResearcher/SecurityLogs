@@ -21,19 +21,23 @@ class CCTV {
     this.readyToPlay = bool;
   }
 
-  play = () => {
+  //takes in a timecode to display as "base"; (not related to play time)
+  play = (timecode) => {
       this.playing = true;
-      this.oneCCTVFrame();
+      this.oneCCTVFrame(timecode);
   }
 
 
   //autopanning based on time code? back and forth?
-  oneCCTVFrame = () => {
+  oneCCTVFrame = (timecode) => {
       if (!this.playing) {
           return;
       }
       //simulate video glitches
       const frame = this.cameraFeed.current_frame;
+      if(timecode){
+        this.cameraFeed.timecode = timecode;
+      }
       const outputCanvas = this.outputCanvas;
       let hacked_frame = frame;
       if (frame % 30 === 0 || frame % 32 === 0 || frame % 55 === 0 || frame % 111 === 0 || frame % 113 === 0 || frame % 115 === 0) {
@@ -60,7 +64,7 @@ class CCTV {
 
       context.fillStyle = "white";
       context.font = `${fontSize}px serif`;
-      const time = getTimeString(new Date(frame * 100));
+      const time = getTimeString(new Date(this.cameraFeed.timecode*100));
 
       this.cctv_effect(buffer, hacked_frame);
       context.fillText(time, buffer.width - 100, padding);
@@ -181,6 +185,7 @@ class CCTV {
 class CameraFeed{
   index = 0; //is this the first image in a set? last? just for labeling
   current_frame = 0;
+  timecode = 0;
 
   constructor(index, frames){
       this.index = index;
@@ -195,6 +200,7 @@ class CameraFeed{
 
   newFrame = (hacked_frame)=>{
       this.current_frame ++;
+      this.timecode ++;
       const current_location  = hacked_frame % this.loopLength();
       let index = 0;
       //if i go in order, the first frame i find that i have no yet passed is what i return;
