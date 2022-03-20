@@ -36,6 +36,17 @@
         "[BEGIN LOG: December 14th, 2008]",
         "18:00: DAY SHIFT HERE. BEEN TOLD MOST OF THE PREVIOUS SEC TEAM GOT LET GO. NOT SURE WHY. THEY ONLY JUST GOT THE LOGS AND FEEDS UP AND RUNNING A FEW MINUTES AGO. I WON'T HAVE TIME TO REVIEW THEM BEFORE THE SHIFT CHANGE. GOOD LUCK. OVER.",
         "P.S. DON'T FORGET TO CHECK ALL CAMERA FEEDS. DON'T SCREW THIS UP.  GUESTS OR NOT WE HAVE A JOB TO DO.",
+        "[BEGIN LOG: December 8th, 2008]",
+        "[TIMECODE: 08:03.] DISTURBANCE. MINOR SCUFFLING BETWEEN GUESTS CHECKING OUT. STAFF DISPATCHED.",
+        "[TIMECODE: 08:14.] ALL CLEAR.",
+        "[TIMECODE: 10:21.] DISTURBANCE. GUEST COMPLAINT REGARDING SERVICE. NO SECURITY ACTION REQUIRED. ALL CLEAR.",
+        "[TIMECODE: 13:01.]  LUNCH BREAK. MAC TAKING OVER FOR ME.",
+        "[TIMECODE: 13:29]  RETURN. NO MAJOR DISTURBANCES REPORTED. RESUMING OBSERVATIONS.",
+        "[TIMECODE:14:57] DISTURBANCE.  MULTIPLE GUEST RESERVATIONS NOT FOUND. LARGE AMOUNT OF GUESTS WAITING TO CHECK IN WERE VISIBLY UPSET.  STAFF DISPATCHED.",
+        "[TIMECODE:15:24]. ALL CLEAR.",
+        "[TIMECODE:17:42] DISTURBANCE. GUEST SLIPPED ON WET FLOOR. NO SECURITY ACTION REQUIRED. ALL CLEAR.",
+        "[TIMECODE: 19:23] LAST SCHEDULED GUEST CHECKED IN. LOCKDOWN PROCEDURES INITIATED.",
+        "[TIMECODE: 22:15.] DISTURBANCE. MASS POWER OUTAGE. STAFF DISPATCHED.",
       ];
       const cctv = await setUpCCTV(canvas,"images/lobby.PNG")
       const button = document.createElement("button");
@@ -47,9 +58,25 @@
 
     const screen2 = async(canvas,buttonBar) => {
       const lines = [
-        "TESTING...1.2.3...",
-        "TESTING...4.5.6...",
-
+        "[TIMECODE: 07:00.][AUTOMATED GUEST HOURLY COUNT]: 1 ",
+        "[TIMECODE: 08:00.][AUTOMATED GUEST HOURLY COUNT]: 2 ",
+        "[TIMECODE: 08:00.][AUTOMATED GUEST HOURLY COUNT]: 1",
+        "[TIMECODE: 09:00.][AUTOMATED GUEST HOURLY COUNT]: 13",
+        "[TIMECODE: 10:00.][AUTOMATED GUEST HOURLY COUNT]: 85",
+        "[TIMECODE: 11:00.][AUTOMATED GUEST HOURLY COUNT]: 1",
+        "[TIMECODE: 12:00.][AUTOMATED GUEST HOURLY COUNT]: 0",
+        "[TIMECODE: 13:00.][AUTOMATED GUEST HOURLY COUNT]: 0",
+        "[TIMECODE: 14:00.][AUTOMATED GUEST HOURLY COUNT]: 5",
+        "[TIMECODE: 15:00.][AUTOMATED GUEST HOURLY COUNT]: 57",
+        "[TIMECODE: 16:00.][AUTOMATED GUEST HOURLY COUNT]: 10",
+        "[TIMECODE: 17:00.][AUTOMATED GUEST HOURLY COUNT]: 2",
+        "[TIMECODE: 18:00.][AUTOMATED GUEST HOURLY COUNT]: 11",
+        "[TIMECODE: 19:00.][AUTOMATED GUEST HOURLY COUNT]: 0",
+        "[TIMECODE: 20:00.][AUTOMATED GUEST HOURLY COUNT]: 0",
+        "[TIMECODE: 21:00.][AUTOMATED GUEST HOURLY COUNT]: 0",
+        "[TIMECODE: 22:00.][AUTOMATED GUEST HOURLY COUNT]: 113",
+        "[TIMECODE: 23:00.][AUTOMATED GUEST HOURLY COUNT]: 0",
+        "[SYSTEM SHUTOFF]",
       ];
       const cctv = await setUpCCTV(canvas,"images/entrance.jpg")
       const button = document.createElement("button");
@@ -95,15 +122,19 @@
 
     const typeWrite = async (scroll_element, element, text) => {
       typing = true;
-      if (text.charAt(0) == "[") {
-        element.innerHTML = text;
-        await sleep(speed * 10);
-        return;
-      }
+      let skipping = false;
       for (let i = 0; i < text.length; i++) {
-        await sleep(speed);
-        clickAudio.play();
+        if(text.charAt(i) === "["){
+          skipping = true;
+        }else if(text.charAt(i)==="]"){
+          skipping = false;
+        }
+        if(!skipping){
+          await sleep(speed);
+          clickAudio.play();
+        }
         element.innerHTML += text.charAt(i);
+        scroll_element.scrollTop = scroll_element.scrollHeight;
         if(!typing){
           break;
         }
@@ -154,6 +185,7 @@
 
       <div class="terminal" id="log-terminal">
         <button id="log-button" onClick="play(0)">Loading...</button>
+        (CLICK AND HOLD TO SPEED UP)
       </div>
     </div>
     <div id = "button-bar"></div>
