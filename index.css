@@ -4,6 +4,12 @@
 }
 
 
+@font-face {
+  font-family: inspiration;
+  src: url("Inspiration-Regular.ttf");
+}
+
+
 body {
   background-color: #131313;
   font-family: gamer;
@@ -110,6 +116,19 @@ body {
   position: relative;
   line-height: 20px;
 
+}
+
+#branding{
+  width: 100%;
+  font-size: 28px;
+  margin-bottom: 50px;
+}
+
+.branding-big-letter{
+  font-family: inspiration;
+  font-size: 55px;
+  line-height: 38px;
+  padding-right: 5px;
 }
 #log-button{
   font-family: gamer;
