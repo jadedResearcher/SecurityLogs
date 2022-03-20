@@ -28,8 +28,15 @@
       button.innerHTML = "Click To Log In";
 
       cameras.push(one);
+
       const two = await screen2(canvas, buttonBar);
       cameras.push(two);
+
+      const three = await screen3(canvas, buttonBar);
+      cameras.push(three);
+
+      const four = await screen4(canvas, buttonBar);
+      cameras.push(four);
     }
 
     const screen1 = async (canvas, buttonBar) => {
@@ -38,15 +45,15 @@
         "21:55: DAY SHIFT HERE. BEEN TOLD MOST OF THE PREVIOUS SEC TEAM GOT LET GO. NOT SURE WHY. THEY ONLY JUST GOT THE LOGS AND FEEDS UP AND RUNNING A FEW MINUTES AGO. I WON'T HAVE TIME TO REVIEW THEM BEFORE THE SHIFT CHANGE. GOOD LUCK. OVER.",
         "P.S. DON'T FORGET TO CHECK ALL CAMERA FEEDS. DON'T SCREW THIS UP.  GUESTS OR NOT WE HAVE A JOB TO DO.",
         "[BEGIN LOG: December 8th, 2008]",
-        "[TIMECODE: 08:03.] DISTURBANCE. MINOR SCUFFLING BETWEEN GUESTS CHECKING OUT. STAFF DISPATCHED.",
+        "[TIMECODE: 08:03.] DISTURBANCE. MINOR SCUFFLING BETWEEN GUESTS A4 and U2 CHECKING OUT. STAFF DISPATCHED.",
         "[TIMECODE: 08:14.] ALL CLEAR.",
-        "[TIMECODE: 10:21.] DISTURBANCE. GUEST COMPLAINT REGARDING SERVICE. NO SECURITY ACTION REQUIRED. ALL CLEAR.",
+        "[TIMECODE: 10:21.] DISTURBANCE. GUEST H1 COMPLAINT REGARDING SERVICE. NO SECURITY ACTION REQUIRED. ALL CLEAR.",
         "[TIMECODE: 13:01.]  LUNCH BREAK. MAC TAKING OVER FOR ME.",
         "[TIMECODE: 13:29]  RETURN. NO MAJOR DISTURBANCES REPORTED. RESUMING OBSERVATIONS.",
         "[TIMECODE:14:57] DISTURBANCE.  MULTIPLE GUEST RESERVATIONS NOT FOUND. LARGE AMOUNT OF GUESTS WAITING TO CHECK IN WERE VISIBLY UPSET.  STAFF DISPATCHED.",
         "[TIMECODE:15:24]. ALL CLEAR.",
-        "[TIMECODE:17:42] DISTURBANCE. GUEST SLIPPED ON WET FLOOR. NO SECURITY ACTION REQUIRED. ALL CLEAR.",
-        "[TIMECODE: 19:23] LAST SCHEDULED GUEST CHECKED IN. LOCKDOWN PROCEDURES INITIATED.",
+        "[TIMECODE:17:42] DISTURBANCE. GUEST V3 SLIPPED ON WET FLOOR. NO SECURITY ACTION REQUIRED. ALL CLEAR.",
+        "[TIMECODE: 19:23] LAST SCHEDULED GUEST (G1) CHECKED IN. LOCKDOWN PROCEDURES INITIATED.",
         "[TIMECODE: 22:15.] DISTURBANCE. MASS POWER OUTAGE. STAFF DISPATCHED.",
       ];
       const cctv = await setUpCCTV(canvas, "images/lobby.PNG")
@@ -83,6 +90,47 @@
       const button = document.createElement("button");
       button.innerHTML = "ENTRANCE";
       button.onclick = () => { play(1) };
+      buttonBar.append(button);
+      return { lines, cctv }
+    }
+
+    const screen3 = async (canvas, buttonBar) => {
+      //guests are not supposed to want the sun or the outside world anymore
+      const lines = [
+        "[BEGIN LOG: December 14th, 2008]",
+        "[TIMECODE: 08:15]: Guest 4A exhibiting BEHAVIOR 7. File indicates this is not the first time.",
+        "[TIMECODE: 08:23]: Guest 4A leaves. File updated to increase discouragement protocols.",
+        "[TIMECODE: 12:04]: Staff Lunch shifts begins. LOCKDOWN Protocol Initiated.",
+        "[TIMECODE: 13:45]: Staff Lunch shifts ends. LOCKDOWN Protocol revoked.",
+        "[TIMECODE: 22:41]: WARNING: UNKNOWN GUEST DETECTED. ",
+        "[TIMECODE: 22:42]: WARNING: COMPANY PROPERTY DAMAGED.",
+        "[TIMECODE: 22:43]: WARNING: GUEST ESCAPED.",
+      ];
+      const cctv = await setUpCCTV(canvas, "images/garden.jpg")
+      const button = document.createElement("button");
+      button.innerHTML = "GARDEN";
+      button.onclick = () => { play(2) };
+      buttonBar.append(button);
+      return { lines, cctv }
+    }
+
+    
+    const screen4 = async (canvas, buttonBar) => {
+      const lines = [
+        "[BEGIN LOG: December 14th, 2008]",
+        "[TIMECODE: 07:04]: Guest Z1 is violently refusing to eat supplements. File updated to reflect a later check out date. Security alerted.",
+        "[TIMECODE: 07:17]: Security alert canceled.",
+        "[TIMECODE: 10:01]: Breakfast Report: 91% compliance rating at nutritional supplements. Guests are increasingly accepting supplements as 'luxury'. Success reported to Management.",
+        "[TIMECODE: 14:01]: Lunch Report:  85% compliance rating at nutritional supplements. Noncompliant guest reactions range from disgust to amusement. ",
+        "[TIMECODE: 16:04]: Guest W4 making funny faces at the camera. Note for dayshift to reposition camera. ",
+        "[TIMECODE: 20:01]: Dinner Report: 19% compliance rating at nutritional supplements. 'Blue Shrimp' marked as failure.",
+        "[TIMECODE: 22:05]:  Staff attempted to remove costume during working hours in view of guests.  Disciplinary action noted in file for the entire night shift.",
+        "[TIMECODE: 22:15]: Power failure. Security alerted.",
+      ];
+      const cctv = await setUpCCTV(canvas, "images/cafe.jpg")
+      const button = document.createElement("button");
+      button.innerHTML = "CAFE";
+      button.onclick = () => { play(3) };
       buttonBar.append(button);
       return { lines, cctv }
     }
@@ -149,7 +197,7 @@
       let timecode = display_screen?.cameraFeed?.timecode ?? 108500; //22:00
       console.log("JR NOTE: attempting to play at", timecode);
 
-      transcript(cameras[camera_index].lines);
+      setTimeout(()=>{transcript(cameras[camera_index].lines)}, 1000);
       display_screen.cameraFeed = cameras[camera_index].cctv.cameraFeed;
       display_screen.play(timecode);
     }
