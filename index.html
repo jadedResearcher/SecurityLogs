@@ -1,7 +1,7 @@
 <html>
 
 <head>
-  <title>The Truth About Alt</title>
+  <title>Security Logs</title>
   <link rel="stylesheet" href="index.css">
   <link rel="icon" href="alt.ico" />
   <script src="cctv.js"></script>
@@ -12,70 +12,126 @@
     const clickAudio = new Audio("audio/web_SoundFX_254286__jagadamba__mechanical-switch.mp3");
     let speed = 50;
 
-  
-    const transcript = async () => {
+    //consists of a set of terminal log lines, and a cctv feed.
+    const cameras = [];
+
+    let current_cctv;
+    let typing = false;
+
+    const setupScreens = async() => {
+      const button = document.querySelector("#log-button");
+      const buttonBar = document.querySelector("#button-bar");
+
+      const canvas = document.querySelector("#canvas");
+      const one = await screen1(canvas, buttonBar);
+      button.innerHTML = "Click To Log In";
+
+      cameras.push(one);
+      const two = await screen2(canvas, buttonBar);
+      cameras.push(two);
+    }
+
+    const screen1 = async(canvas,buttonBar) => {
       const lines = [
         "[BEGIN LOG: December 14th, 2008]",
-         "18:00: DAY SHIFT HERE. BEEN TOLD MOST OF THE PREVIOUS SEC TEAM GOT LET GO. NOT SURE WHY. THEY ONLY JUST GOT THE LOGS UP AND RUNNING A FEW MINUTES AGO. I WON'T HAVE TIME TO REVIEW THEM BEFORE THE SHIFT CHANGE. GOOD LUCK. OVER.",
-         "P.S. DON'T FORGET TO CHECK ALL CAMERA FEEDS. DON'T SCREW THIS UP."
-        ];
+        "18:00: DAY SHIFT HERE. BEEN TOLD MOST OF THE PREVIOUS SEC TEAM GOT LET GO. NOT SURE WHY. THEY ONLY JUST GOT THE LOGS AND FEEDS UP AND RUNNING A FEW MINUTES AGO. I WON'T HAVE TIME TO REVIEW THEM BEFORE THE SHIFT CHANGE. GOOD LUCK. OVER.",
+        "P.S. DON'T FORGET TO CHECK ALL CAMERA FEEDS. DON'T SCREW THIS UP.  GUESTS OR NOT WE HAVE A JOB TO DO.",
+      ];
+      const cctv = await setUpCCTV(canvas,"images/lobby.PNG")
+      const button = document.createElement("button");
+      button.innerHTML = "LOBBY";
+      button.onclick= ()=>{play(0)};
+      buttonBar.append(button);
+      return { lines, cctv }
+    }
+
+    const screen2 = async(canvas,buttonBar) => {
+      const lines = [
+        "TESTING...1.2.3...",
+        "TESTING...4.5.6...",
+
+      ];
+      const cctv = await setUpCCTV(canvas,"images/entrance.jpg")
+      const button = document.createElement("button");
+      button.innerHTML = "ENTRANCE";
+      button.onclick= ()=>{play(1)};
+      buttonBar.append(button);
+      return { lines, cctv }
+    }
+
+
+    const transcript = async (lines) => {
+      typing = true;
       const terminal = document.querySelector("#log-terminal");
       terminal.innerHTML = "";
-      for(let line of lines){
+      for (let line of lines) {
+        if(!typing){
+          break;
+        }
         const element = document.createElement("p");
         terminal.append(element);
-        await typeWrite(terminal,element, line)
-        await sleep(speed*10);
+        await typeWrite(terminal, element, line)
+        await sleep(speed * 10);
 
       }
     }
 
-    const setupCanvas = ()=>{
-      const canvas = document.querySelector("#canvas");
-      const image = document.createElement("img");
+    const setUpCCTV = async (canvas, src) => {
+      try{
+      console.log("JR NOTE: trying to set up cctv", canvas, src)
       const frames = [];
-      image.crossOrigin = "Anonymous";
-      image.onload = ()=>{
-        console.log("JR NOTE: image loaded")
-        frames.push(new AnimationFrame(image, 1));
-        const feed = new CameraFeed(0,frames);
-        const cctv = new CCTV(feed, canvas);
-        cctv.play();
+      const image = await addImageProcess(src);
+      console.log("JR NOTE: image is", image)
+      frames.push(new AnimationFrame(image, 1));
+      const feed = new CameraFeed(0, frames);
+      const cctv = new CCTV(feed, canvas);
+      cctv.setReadyToPlay(true);
+      return cctv;
+      }catch(e){
+        console.error("ERROR SETTING UP CCTV FEED!")
+        return null;
       }
-      image.src = "sample.jpg";
     }
 
-    const typeWrite = async(scroll_element, element,text) => {
-      if(text.charAt(0)=="["){
-        element.innerHTML=text;
-        scroll_element.scrollTop = scroll_element.scrollHeight;
-        await sleep(speed* 10);
+    const typeWrite = async (scroll_element, element, text) => {
+      typing = true;
+      if (text.charAt(0) == "[") {
+        element.innerHTML = text;
+        await sleep(speed * 10);
         return;
       }
-      console.log("JR NOTE: first char is", text.charAt[0], "speed is", speed);
-      for(let i = 0; i< text.length; i++){
+      for (let i = 0; i < text.length; i++) {
         await sleep(speed);
         clickAudio.play();
         element.innerHTML += text.charAt(i);
-        scroll_element.scrollTop = scroll_element.scrollHeight;
+        if(!typing){
+          break;
+        }
       }
     }
 
-    const play = () => {
-      transcript();
+    const play = (camera_index) => {
+      console.log("JR NOTE: attempting to play", camera_index);
+      typing = false;
+      transcript(cameras[camera_index].lines);
+      if(current_cctv){
+        current_cctv.stop();
+      }
+      current_cctv = cameras[camera_index].cctv;
+      current_cctv.play();
     }
 
 
     window.onload = () => {
-      setupCanvas();
+      setupScreens();
       window.onclick = () => {
         clickAudio.play();
       }
 
-      window.onmousedown = ()=>{
-          speed = 0;
+      window.onmousedown = () => {
+        speed = 0;
       }
-      window.onmouseup = ()=>{
+      window.onmouseup = () => {
         speed = 50;
       }
     }
@@ -85,22 +141,23 @@
 </head>
 
 <body>
-  <div id ="dock">
-  <div id="tv">
-    <div class="terminal" id="tv-terminal">
-      <canvas id="canvas" width="500" height="500"/>
+  <div id="dock">
+    <div id="tv">
+      <div class="terminal" id="tv-terminal">
+        <canvas id="canvas" width="500" height="500" />
+      </div>
     </div>
-  </div>
 
-  <div id="crt">
-    <div class="scanline"></div>
-    <div class="lines"></div>
+    <div id="crt">
+      <div class="scanline"></div>
+      <div class="lines"></div>
 
-    <div class="terminal" id="log-terminal">
-      <button id="log-button" onClick="play()">Click To View Associated Log</button>
+      <div class="terminal" id="log-terminal">
+        <button id="log-button" onClick="play(0)">Loading...</button>
+      </div>
     </div>
+    <div id = "button-bar"></div>
   </div>
-</div>
 
 </body>
 

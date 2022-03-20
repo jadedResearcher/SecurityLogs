@@ -6,6 +6,15 @@ const pickFrom = (array) => {
   return array[getRandomNumberBetween(0, array.length - 1)];
 }
 
+const addImageProcess =(src)=>{
+  return new Promise((resolve, reject) => {
+    let img = new Image()
+    img.onload = () => resolve(img)
+    img.onerror = reject
+    img.src = src
+  })
+}
+
 const sleep = (ms) => {
   return new Promise(resolve => setTimeout(resolve, ms));
 }

@@ -108,6 +108,7 @@ body {
   border-radius: 13px;
   text-overflow: hidden;
   position: relative;
+  line-height: 20px;
 
 }
 #log-button{
@@ -122,6 +123,13 @@ body {
   margin-top: 25%;
   position: absolute;
   left: 150px;
+}
+
+button{
+  font-family: gamer;
+  background: black;
+  color: white;
+  padding: 20px;
 }
 
 canvas{

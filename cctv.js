@@ -10,14 +10,18 @@ class CCTV {
   constructor(cameraFeed, outputCanvas) {
       this.cameraFeed = cameraFeed;
       this.outputCanvas = outputCanvas;
+      this.readyToPlay = false;
   }
 
   stop = () => {
       this.playing = false;
   }
 
+  setReadyToPlay = (bool)=>{
+    this.readyToPlay = bool;
+  }
+
   play = () => {
-      //JR NOTE TODO
       this.playing = true;
       this.oneCCTVFrame();
   }
