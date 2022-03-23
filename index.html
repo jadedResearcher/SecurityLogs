@@ -37,13 +37,19 @@
 
       const four = await screen4(canvas, buttonBar);
       cameras.push(four);
+
+      const five = await screen5(canvas, buttonBar);
+      cameras.push(five);
+
+      const six = await screen6(canvas, buttonBar);
+      cameras.push(six);
     }
 
     const screen1 = async (canvas, buttonBar) => {
       const lines = [
         "[BEGIN LOG: December 14th, 2008]",
         "21:55: DAY SHIFT HERE. BEEN TOLD MOST OF THE PREVIOUS SEC TEAM GOT LET GO. NOT SURE WHY. THEY ONLY JUST GOT THE LOGS AND FEEDS UP AND RUNNING A FEW MINUTES AGO. I WON'T HAVE TIME TO REVIEW THEM BEFORE THE SHIFT CHANGE. GOOD LUCK. OVER.",
-        "P.S. DON'T FORGET TO CHECK ALL CAMERA FEEDS. DON'T SCREW THIS UP.  GUESTS OR NOT WE HAVE A JOB TO DO.",
+        "P.S. DON'T FORGET TO HAVE YOUR TEAM CHECK ALL CAMERA FEEDS. DON'T SCREW THIS UP.  GUESTS OR NOT WE HAVE A JOB TO DO.",
         "[BEGIN LOG: December 8th, 2008]",
         "[TIMECODE: 08:03.] DISTURBANCE. MINOR SCUFFLING BETWEEN GUESTS A4 and U2 CHECKING OUT. STAFF DISPATCHED.",
         "[TIMECODE: 08:14.] ALL CLEAR.",
@@ -131,6 +137,38 @@
       const button = document.createElement("button");
       button.innerHTML = "CAFE";
       button.onclick = () => { play(3) };
+      buttonBar.append(button);
+      return { lines, cctv }
+    }
+
+    const screen5 = async (canvas, buttonBar) => {
+      const lines = [
+        "[BEGIN LOG: December 14th, 2008]",
+        "[TIMECODE: 12:04]: Guest V2 has left room for the first time during their stay. Staff dispatched.",
+        "[TIMECODE: 15:21]:  Guest V2 has vomited. Staff dispatched.",
+        "[TIMECODE: 22:10]:  Unauthorized staff entry to Maintenance Closet B. Disciplinary action filed for all night shift Staff.",
+        "[TIMECODE: 22:15]: Power failure. Staff dispatched.",
+      ];
+      const cctv = await setUpCCTV(canvas, "images/hallway1.jpg")
+      const button = document.createElement("button");
+      button.innerHTML = "HALLWAY";
+      button.onclick = () => { play(4) };
+      buttonBar.append(button);
+      return { lines, cctv }
+    }
+
+    const screen6 = async (canvas, buttonBar) => {
+      const lines = [
+        "[BEGIN LOG: December 14th, 2008]",
+        "[TIMECODE: 15:29]:  Staff retrieval of cleaning supplies.",
+        "[TIMECODE: 22:08]:  Unauthorized entry by member of Staff.",
+        "[TIMECODE: 22:08]: Staff member... Um. Dispatch? Staff member is...stabbing a cardboard box? Please advise.",
+        "[TIMECODE: 22:15]: Unknown person wearing Staff costume flips all fuses at once. Power goes out.  Notes indicate this causes a known problem with the wiring. I'm worried it won't be easy to get the power back on. What the HELL is going on?",
+      ];
+      const cctv = await setUpCCTV(canvas, "images/closet.jpg")
+      const button = document.createElement("button");
+      button.innerHTML = "CLOSET";
+      button.onclick = () => { play(5) };
       buttonBar.append(button);
       return { lines, cctv }
     }
