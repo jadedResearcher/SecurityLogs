@@ -1,0 +1,135 @@
+<html>
+
+<head>
+  <title>Security Logs</title>
+  <link rel="stylesheet" href="index.css">
+  <link rel="icon" href="alt.ico" />
+  <script src="cctv.js"></script>
+  <script src="utils.js"></script>
+  <script src="Facts/index.js"></script>
+  <script src="Fiction/index.js"></script>
+
+  <script>
+    //https://dev.to/ekeijl/retro-crt-terminal-screen-in-css-js-4afh
+    const clickAudio = new Audio("audio/web_SoundFX_254286__jagadamba__mechanical-switch.mp3");
+    let speed = 50;
+
+    //consists of a set of terminal log lines, and a cctv feed.
+    const cameras = [];
+
+    let display_screen;
+    let typing = false;
+
+    const transcript = async (lines) => {
+      typing = true;
+      const terminal = document.querySelector("#log-terminal");
+      terminal.innerHTML = "";
+      for (let line of lines) {
+        if (!typing) {
+          break;
+        }
+        const element = document.createElement("p");
+        terminal.append(element);
+        await typeWrite(terminal, element, line)
+        await sleep(speed * 10);
+
+      }
+    }
+
+    const setUpCCTV = async (canvas, src) => {
+      try {
+        console.log("JR NOTE: trying to set up cctv", canvas, src)
+        const frames = [];
+        const image = await addImageProcess(src);
+        console.log("JR NOTE: image is", image)
+        frames.push(new AnimationFrame(image, 1));
+        const feed = new CameraFeed(0, frames);
+        const cctv = new CCTV(feed, canvas);
+        cctv.setReadyToPlay(true);
+        return cctv;
+      } catch (e) {
+        console.error("ERROR SETTING UP CCTV FEED!")
+        return null;
+      }
+    }
+
+    const typeWrite = async (scroll_element, element, text) => {
+      typing = true;
+      let skipping = false;
+      for (let i = 0; i < text.length; i++) {
+        if (text.charAt(i) === "[") {
+          skipping = true;
+        } else if (text.charAt(i) === "]") {
+          skipping = false;
+        }
+        if (!skipping) {
+          await sleep(speed);
+          clickAudio.play();
+        }
+        element.innerHTML += text.charAt(i);
+        scroll_element.scrollTop = scroll_element.scrollHeight;
+        if (!typing) {
+          break;
+        }
+      }
+    }
+
+    const play = (camera_index) => {
+      console.log("JR NOTE: attempting to play", camera_index);
+      typing = false;
+      display_screen.stop();
+      let timecode = display_screen?.cameraFeed?.timecode ?? 108500; //22:00
+      console.log("JR NOTE: attempting to play at", timecode);
+
+      setTimeout(()=>{transcript(cameras[camera_index].lines)}, 1000);
+      display_screen.cameraFeed = cameras[camera_index].cctv.cameraFeed;
+      setTimeout(()=>{display_screen.play(timecode)}, 1000);
+    }
+
+
+    window.onload = () => {
+      if(getParameterByName("truth", null) || new Date().getDay() === 3){
+         setupScreensFact();
+      }else{
+        setupScreensFiction();
+      }
+      window.onclick = () => {
+        clickAudio.play();
+      }
+
+      window.onmousedown = () => {
+        speed = 0;
+      }
+      window.onmouseup = () => {
+        speed = 50;
+      }
+    }
+  </script>
+
+
+</head>
+
+<body>
+  <div id="dock">
+    <div id="branding"><span class="branding-big-letter">Z</span>ampanio Galactice Warpship Security</div>
+    <div id="tv">
+      <div class="terminal" id="tv-terminal">
+        <canvas id="canvas" width="500" height="500" />
+      </div>
+    </div>
+
+    <div id="crt">
+      <div class="scanline"></div>
+      <div class="lines"></div>
+
+      <div class="terminal" id="log-terminal">
+        <button id="log-button" onClick="play(0)">Loading...</button>
+        (CLICK AND HOLD TO SPEED UP)
+      </div>
+    </div>
+    <div id="button-bar"></div>
+  </div>
+
+</body>
+
+</html>
