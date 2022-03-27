@@ -303,7 +303,7 @@
 
       setTimeout(()=>{transcript(cameras[camera_index].lines)}, 1000);
       display_screen.cameraFeed = cameras[camera_index].cctv.cameraFeed;
-      display_screen.play(timecode);
+      setTimeout(()=>{display_screen.play(timecode)}, 1000);
     }
 
 
