@@ -68,7 +68,7 @@ class CCTV {
 
       this.cctv_effect(buffer, hacked_frame);
       context.fillText(time, buffer.width - 100, padding);
-      context.fillText(`${this.cameraFeed.index}`, padding, padding);
+      context.fillText(`2008-12-15`, 15, padding);
 
       const outputContext = outputCanvas.getContext("2d");
       outputContext?.drawImage(buffer, 0, 0);
