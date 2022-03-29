@@ -110,6 +110,12 @@ const setupScreensFact = async () => {
         "The idea that a pokemon could evolve ONE way in one situation and another in another was. Hype af tbh.",
         "It's a cherished memory I have. And now its yours, as well."
     ];
+    const cctv = await setUpCCTV(canvas, "Facts/images/mall.jpg")
+    const button = document.createElement("button");
+    button.innerHTML = "Pokemon";
+    button.onclick = () => { play(3) };
+    buttonBar.append(button);
+    return { lines, cctv }
 }
 
     const jr5 = async (canvas, buttonBar) => {
